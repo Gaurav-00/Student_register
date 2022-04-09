@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request
+from flask import Flask,render_template,request,redirect
 import sqlite3
 #to create connection with db
 conn= sqlite3.connect("Studentmanagement.db",check_same_thread=False) #to avoid conflicts use this means storing data in another db instead of this db to avoid such condition
@@ -40,6 +40,8 @@ def register():
         try:
             conn.execute("INSERT INTO STUDENT(NAME,PHONE_NO,USERNAME,EMAIL,PASSWORD)VALUES ('"+getName+"','"+getPhoneno+"','"+getusername+"','"+getemail+"','"+getpassword+"')")
             print("Successfully inserted")
+            conn.commit()
+            return redirect('/viewall')
         except Exception as e:
             print(e)
     return render_template("register.html")
@@ -49,6 +51,11 @@ def Search_data():
 @app.route("/delete")
 def deletestudent():
     return "student deleted is"
-
+@app.route("/viewall")
+def viewall():
+    cursor=conn.cursor()
+    cursor.execute("Select * from Student")
+    result=cursor.fetchall()
+    return render_template("viewall.html",students=result)
 if __name__=="__main__":
     app.run()
